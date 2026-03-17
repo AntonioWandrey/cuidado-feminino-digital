@@ -6,6 +6,7 @@
 All colors MUST be HSL.
 */
 
+@layer base {
   :root {
     --background: 340 33% 98%;
     --foreground: 340 30% 15%;
