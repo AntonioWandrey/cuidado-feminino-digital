@@ -1,16 +1,36 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import BottomNav from "@/components/BottomNav";
+import HomePage from "@/pages/HomePage";
+import TrilhasPage from "@/pages/TrilhasPage";
+import CalendarioPage from "@/pages/CalendarioPage";
+import PerfilPage from "@/pages/PerfilPage";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
+  const [activeTab, setActiveTab] = useState("home");
+
+  const renderPage = () => {
+    switch (activeTab) {
+      case "home":
+        return <HomePage onNavigate={setActiveTab} />;
+      case "trilhas":
+        return <TrilhasPage />;
+      case "calendario":
+        return <CalendarioPage />;
+      case "perfil":
+        return <PerfilPage />;
+      default:
+        return <HomePage onNavigate={setActiveTab} />;
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="min-h-screen bg-background">
+      <div className="max-w-lg mx-auto px-4 pt-6 pb-24">
+        {renderPage()}
+      </div>
+      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
