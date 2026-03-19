@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { User, Bell, Shield, HelpCircle, LogOut, Save, ArrowLeft } from "lucide-react";
+import { User, Bell, Shield, HelpCircle, LogOut, Save, ArrowLeft, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { profileSchema, type ProfileFormData } from "@/lib/validations";
 
 interface ProfileData {
   name: string;
@@ -25,26 +26,38 @@ const PerfilPage = () => {
   const [editing, setEditing] = useState(false);
   const [profile, setProfile] = useState<ProfileData>(defaultProfile);
   const [saved, setSaved] = useState(false);
-
-  const sanitize = (str: string) =>
-    str.replace(/[<>"'&]/g, "");
-
-  const fieldLimits: Record<string, number> = {
-    name: 80,
-    email: 120,
-    phone: 20,
-    cycleLength: 2,
-  };
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const update = (field: keyof ProfileData, value: string | boolean) => {
-    if (typeof value === "string") {
-      const limit = fieldLimits[field] || 100;
-      value = sanitize(value).slice(0, limit);
-    }
     setProfile((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
   };
 
   const handleSave = () => {
+    const parsed = profileSchema.safeParse({
+      name: profile.name,
+      birthDate: profile.birthDate || undefined,
+      email: profile.email,
+      phone: profile.phone,
+      cycleLength: parseInt(profile.cycleLength) || 28,
+      notifications: profile.notifications,
+    });
+
+    if (!parsed.success) {
+      const fieldErrors: Record<string, string> = {};
+      parsed.error.errors.forEach((e) => {
+        const field = e.path[0] as string;
+        fieldErrors[field] = e.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setErrors({});
     setSaved(true);
     setTimeout(() => {
       setSaved(false);
@@ -54,6 +67,15 @@ const PerfilPage = () => {
 
   const inputClass =
     "w-full bg-background border border-border rounded-2xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring";
+  const errorInputClass =
+    "w-full bg-background border border-destructive rounded-2xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-destructive";
+
+  const FieldError = ({ field }: { field: string }) =>
+    errors[field] ? (
+      <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+        <AlertCircle size={12} /> {errors[field]}
+      </p>
+    ) : null;
 
   if (editing) {
     return (
@@ -69,23 +91,28 @@ const PerfilPage = () => {
         <div className="space-y-4">
           <div>
             <label className="text-xs font-semibold text-muted-foreground mb-1 block">Nome completo</label>
-            <input type="text" value={profile.name} onChange={(e) => update("name", e.target.value)} placeholder="Seu nome" className={inputClass} />
+            <input type="text" value={profile.name} onChange={(e) => update("name", e.target.value)} placeholder="Seu nome" maxLength={80} className={errors.name ? errorInputClass : inputClass} />
+            <FieldError field="name" />
           </div>
           <div>
             <label className="text-xs font-semibold text-muted-foreground mb-1 block">Data de nascimento</label>
-            <input type="date" value={profile.birthDate} onChange={(e) => update("birthDate", e.target.value)} className={inputClass} />
+            <input type="date" value={profile.birthDate} onChange={(e) => update("birthDate", e.target.value)} className={errors.birthDate ? errorInputClass : inputClass} />
+            <FieldError field="birthDate" />
           </div>
           <div>
             <label className="text-xs font-semibold text-muted-foreground mb-1 block">E-mail</label>
-            <input type="email" value={profile.email} onChange={(e) => update("email", e.target.value)} placeholder="seu@email.com" className={inputClass} />
+            <input type="email" value={profile.email} onChange={(e) => update("email", e.target.value)} placeholder="seu@email.com" maxLength={120} className={errors.email ? errorInputClass : inputClass} />
+            <FieldError field="email" />
           </div>
           <div>
             <label className="text-xs font-semibold text-muted-foreground mb-1 block">Telefone</label>
-            <input type="tel" value={profile.phone} onChange={(e) => update("phone", e.target.value)} placeholder="(00) 00000-0000" className={inputClass} />
+            <input type="tel" value={profile.phone} onChange={(e) => update("phone", e.target.value)} placeholder="(00) 00000-0000" maxLength={20} className={errors.phone ? errorInputClass : inputClass} />
+            <FieldError field="phone" />
           </div>
           <div>
             <label className="text-xs font-semibold text-muted-foreground mb-1 block">Duração média do ciclo (dias)</label>
-            <input type="number" value={profile.cycleLength} onChange={(e) => update("cycleLength", e.target.value)} min="20" max="45" className={inputClass} />
+            <input type="number" value={profile.cycleLength} onChange={(e) => update("cycleLength", e.target.value)} min="20" max="45" className={errors.cycleLength ? errorInputClass : inputClass} />
+            <FieldError field="cycleLength" />
           </div>
           <div className="flex items-center justify-between bg-card border border-border rounded-2xl p-4">
             <div>
