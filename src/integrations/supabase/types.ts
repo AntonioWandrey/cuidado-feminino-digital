@@ -14,7 +14,117 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      appointments: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          notes: string | null
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          notes?: string | null
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          birth_date: string | null
+          created_at: string
+          cycle_length: number | null
+          email: string | null
+          id: string
+          name: string
+          notifications: boolean
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          birth_date?: string | null
+          created_at?: string
+          cycle_length?: number | null
+          email?: string | null
+          id?: string
+          name?: string
+          notifications?: boolean
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          birth_date?: string | null
+          created_at?: string
+          cycle_length?: number | null
+          email?: string | null
+          id?: string
+          name?: string
+          notifications?: boolean
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      symptom_logs: {
+        Row: {
+          alert_triggered: boolean
+          created_at: string
+          date: string
+          discharge: string | null
+          id: string
+          mood: string
+          notes: string | null
+          other_signs: string[]
+          symptoms: string[]
+          user_id: string
+        }
+        Insert: {
+          alert_triggered?: boolean
+          created_at?: string
+          date?: string
+          discharge?: string | null
+          id?: string
+          mood: string
+          notes?: string | null
+          other_signs?: string[]
+          symptoms?: string[]
+          user_id: string
+        }
+        Update: {
+          alert_triggered?: boolean
+          created_at?: string
+          date?: string
+          discharge?: string | null
+          id?: string
+          mood?: string
+          notes?: string | null
+          other_signs?: string[]
+          symptoms?: string[]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
