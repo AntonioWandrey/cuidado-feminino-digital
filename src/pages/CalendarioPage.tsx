@@ -31,9 +31,13 @@ const CalendarioPage = () => {
   const [newTitle, setNewTitle] = useState("");
   const [newType, setNewType] = useState<"consulta" | "vacina" | "exame">("consulta");
 
+  const sanitize = (str: string) =>
+    str.replace(/[<>"'&]/g, "").slice(0, 100);
+
   const handleAdd = () => {
-    if (!selected || !newTitle.trim()) return;
-    setAppointments((prev) => [...prev, { date: selected, title: newTitle.trim(), type: newType }]);
+    const clean = sanitize(newTitle.trim());
+    if (!selected || !clean) return;
+    setAppointments((prev) => [...prev, { date: selected, title: clean, type: newType }]);
     setNewTitle("");
     setShowForm(false);
   };
