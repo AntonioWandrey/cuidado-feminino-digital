@@ -94,8 +94,9 @@ const CalendarioPage = () => {
               <input
                 type="text"
                 value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
+                onChange={(e) => setNewTitle(e.target.value.slice(0, 100))}
                 placeholder="Ex: Consulta ginecológica"
+                maxLength={100}
                 className="w-full bg-background border border-border rounded-2xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               />
               <div className="flex gap-2">

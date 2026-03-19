@@ -26,8 +26,23 @@ const PerfilPage = () => {
   const [profile, setProfile] = useState<ProfileData>(defaultProfile);
   const [saved, setSaved] = useState(false);
 
-  const update = (field: keyof ProfileData, value: string | boolean) =>
+  const sanitize = (str: string) =>
+    str.replace(/[<>"'&]/g, "");
+
+  const fieldLimits: Record<string, number> = {
+    name: 80,
+    email: 120,
+    phone: 20,
+    cycleLength: 2,
+  };
+
+  const update = (field: keyof ProfileData, value: string | boolean) => {
+    if (typeof value === "string") {
+      const limit = fieldLimits[field] || 100;
+      value = sanitize(value).slice(0, limit);
+    }
     setProfile((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleSave = () => {
     setSaved(true);
