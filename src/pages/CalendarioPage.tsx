@@ -31,9 +31,13 @@ const CalendarioPage = () => {
   const [newTitle, setNewTitle] = useState("");
   const [newType, setNewType] = useState<"consulta" | "vacina" | "exame">("consulta");
 
+  const sanitize = (str: string) =>
+    str.replace(/[<>"'&]/g, "").slice(0, 100);
+
   const handleAdd = () => {
-    if (!selected || !newTitle.trim()) return;
-    setAppointments((prev) => [...prev, { date: selected, title: newTitle.trim(), type: newType }]);
+    const clean = sanitize(newTitle.trim());
+    if (!selected || !clean) return;
+    setAppointments((prev) => [...prev, { date: selected, title: clean, type: newType }]);
     setNewTitle("");
     setShowForm(false);
   };
@@ -90,8 +94,9 @@ const CalendarioPage = () => {
               <input
                 type="text"
                 value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
+                onChange={(e) => setNewTitle(e.target.value.slice(0, 100))}
                 placeholder="Ex: Consulta ginecológica"
+                maxLength={100}
                 className="w-full bg-background border border-border rounded-2xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               />
               <div className="flex gap-2">
