@@ -3,8 +3,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
-import { Plus, X, Stethoscope, Syringe, FlaskConical, CalendarCheck } from "lucide-react";
+import { Plus, X, Stethoscope, Syringe, FlaskConical, CalendarCheck, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { appointmentSchema } from "@/lib/validations";
 
 interface Appointment {
   date: Date;
@@ -30,14 +31,25 @@ const CalendarioPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newType, setNewType] = useState<"consulta" | "vacina" | "exame">("consulta");
-
-  const sanitize = (str: string) =>
-    str.replace(/[<>"'&]/g, "").slice(0, 100);
+  const [titleError, setTitleError] = useState("");
 
   const handleAdd = () => {
-    const clean = sanitize(newTitle.trim());
-    if (!selected || !clean) return;
-    setAppointments((prev) => [...prev, { date: selected, title: clean, type: newType }]);
+    if (!selected) return;
+
+    const result = appointmentSchema.safeParse({
+      title: newTitle.trim(),
+      type: newType,
+      date: selected.toISOString(),
+    });
+
+    if (!result.success) {
+      const titleErr = result.error.errors.find((e) => e.path[0] === "title");
+      setTitleError(titleErr?.message || "Dados inválidos");
+      return;
+    }
+
+    setTitleError("");
+    setAppointments((prev) => [...prev, { date: selected, title: result.data.title, type: newType }]);
     setNewTitle("");
     setShowForm(false);
   };
@@ -84,21 +96,31 @@ const CalendarioPage = () => {
             <h2 className="font-bold text-sm text-foreground">
               {format(selected, "dd 'de' MMMM", { locale: pt })}
             </h2>
-            <Button size="sm" onClick={() => setShowForm(!showForm)} className="rounded-2xl gap-1.5 text-xs">
+            <Button size="sm" onClick={() => { setShowForm(!showForm); setTitleError(""); }} className="rounded-2xl gap-1.5 text-xs">
               <Plus size={14} /> Agendar
             </Button>
           </div>
 
           {showForm && (
             <div className="bg-card border border-border rounded-2xl p-4 space-y-3 shadow-sm">
-              <input
-                type="text"
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value.slice(0, 100))}
-                placeholder="Ex: Consulta ginecológica"
-                maxLength={100}
-                className="w-full bg-background border border-border rounded-2xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              />
+              <div>
+                <input
+                  type="text"
+                  value={newTitle}
+                  onChange={(e) => { setNewTitle(e.target.value.slice(0, 100)); setTitleError(""); }}
+                  placeholder="Ex: Consulta ginecológica"
+                  maxLength={100}
+                  className={cn(
+                    "w-full bg-background border rounded-2xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2",
+                    titleError ? "border-destructive focus:ring-destructive" : "border-border focus:ring-ring"
+                  )}
+                />
+                {titleError && (
+                  <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                    <AlertCircle size={12} /> {titleError}
+                  </p>
+                )}
+              </div>
               <div className="flex gap-2">
                 {(Object.keys(typeConfig) as Array<keyof typeof typeConfig>).map((t) => (
                   <button

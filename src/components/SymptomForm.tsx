@@ -2,6 +2,7 @@ import { useState } from "react";
 import { X, AlertTriangle, ThermometerSun, Droplets, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { symptomLogSchema } from "@/lib/validations";
 
 interface SymptomFormProps {
   open: boolean;
@@ -45,6 +46,7 @@ const SymptomForm = ({ open, onClose }: SymptomFormProps) => {
   const [discharge, setDischarge] = useState("");
   const [otherAlerts, setOtherAlerts] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
+  const [validationError, setValidationError] = useState("");
 
   const toggle = (list: string[], val: string, setter: React.Dispatch<React.SetStateAction<string[]>>) =>
     setter(list.includes(val) ? list.filter((s) => s !== val) : [...list, val]);
@@ -54,7 +56,22 @@ const SymptomForm = ({ open, onClose }: SymptomFormProps) => {
     dischargeOptions.find((o) => o.value === discharge)?.alert ||
     otherAlerts.some((s) => otherAlertOptions.find((o) => o.value === s)?.alert);
 
-  const handleSubmit = () => setSubmitted(true);
+  const handleSubmit = () => {
+    const result = symptomLogSchema.safeParse({
+      mood,
+      symptoms,
+      discharge: discharge || undefined,
+      otherSigns: otherAlerts,
+    });
+
+    if (!result.success) {
+      setValidationError("Selecione como você está se sentindo.");
+      return;
+    }
+
+    setValidationError("");
+    setSubmitted(true);
+  };
 
   const handleReset = () => {
     setMood("");
@@ -62,11 +79,12 @@ const SymptomForm = ({ open, onClose }: SymptomFormProps) => {
     setDischarge("");
     setOtherAlerts([]);
     setSubmitted(false);
+    setValidationError("");
     onClose();
   };
 
   const openMaps = () => {
-    window.open("https://www.google.com/maps/search/UBS+Unidade+Básica+de+Saúde", "_blank");
+    window.open("https://www.google.com/maps/search/UBS+Unidade+Básica+de+Saúde", "_blank", "noopener,noreferrer");
   };
 
   if (!open) return null;
@@ -97,11 +115,14 @@ const SymptomForm = ({ open, onClose }: SymptomFormProps) => {
                 <h3 className="font-semibold text-sm text-foreground mb-2">Como você está se sentindo?</h3>
                 <div className="grid grid-cols-2 gap-2">
                   {moodOptions.map((m) => (
-                    <button key={m.value} onClick={() => setMood(m.value)} className={cn("p-3 rounded-2xl border text-sm font-medium transition-all", mood === m.value ? "border-primary bg-accent text-accent-foreground" : "border-border bg-card text-foreground hover:border-primary/50")}>
+                    <button key={m.value} onClick={() => { setMood(m.value); setValidationError(""); }} className={cn("p-3 rounded-2xl border text-sm font-medium transition-all", mood === m.value ? "border-primary bg-accent text-accent-foreground" : "border-border bg-card text-foreground hover:border-primary/50")}>
                       {m.label}
                     </button>
                   ))}
                 </div>
+                {validationError && (
+                  <p className="text-xs text-destructive mt-2">{validationError}</p>
+                )}
               </div>
 
               {/* Symptoms */}
