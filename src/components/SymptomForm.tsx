@@ -107,7 +107,7 @@ const SymptomForm = ({ open, onClose }: SymptomFormProps) => {
           </button>
         </div>
 
-        <div className="p-4 space-y-6">
+        <div className="p-4 space-y-6 overflow-y-auto flex-1 pb-6">
           {!submitted ? (
             <>
               {/* Mood */}
