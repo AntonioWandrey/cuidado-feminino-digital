@@ -99,7 +99,7 @@ const SymptomForm = ({ open, onClose }: SymptomFormProps) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-foreground/30 flex items-end justify-center">
-      <div className="bg-background w-full max-w-lg rounded-t-3xl max-h-[85vh] overflow-y-auto animate-in slide-in-from-bottom duration-300">
+      <div className="bg-background w-full max-w-lg rounded-t-3xl max-h-[85vh] flex flex-col animate-in slide-in-from-bottom duration-300">
         <div className="sticky top-0 bg-background z-10 flex items-center justify-between p-4 border-b border-border">
           <h2 className="font-bold text-lg text-foreground">Check-up de Sinais</h2>
           <button onClick={handleReset} className="p-1 rounded-full hover:bg-muted">
@@ -107,7 +107,7 @@ const SymptomForm = ({ open, onClose }: SymptomFormProps) => {
           </button>
         </div>
 
-        <div className="p-4 space-y-6">
+        <div className="p-4 space-y-6 overflow-y-auto flex-1 pb-6">
           {!submitted ? (
             <>
               {/* Mood */}
