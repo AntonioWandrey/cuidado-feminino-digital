@@ -107,7 +107,7 @@ const SymptomForm = ({ open, onClose }: SymptomFormProps) => {
           </button>
         </div>
 
-        <div className="p-4 space-y-6 overflow-y-auto flex-1 pb-6">
+        <div className="p-4 space-y-6 overflow-y-auto flex-1">
           {!submitted ? (
             <>
               {/* Mood */}
@@ -180,10 +180,6 @@ const SymptomForm = ({ open, onClose }: SymptomFormProps) => {
                   </Button>
                 </div>
               )}
-
-              <Button onClick={handleSubmit} className="w-full rounded-2xl" size="lg">
-                Registrar sintomas
-              </Button>
             </>
           ) : (
             <div className="text-center py-8 space-y-3">
@@ -204,10 +200,20 @@ const SymptomForm = ({ open, onClose }: SymptomFormProps) => {
                   </Button>
                 </div>
               )}
-              <Button onClick={handleReset} variant="outline" className="mt-4 rounded-2xl">
-                Fechar
-              </Button>
             </div>
+          )}
+        </div>
+
+        {/* Fixed bottom button */}
+        <div className="shrink-0 p-4 border-t border-border bg-background rounded-t-none">
+          {!submitted ? (
+            <Button onClick={handleSubmit} className="w-full rounded-2xl" size="lg">
+              Registrar sintomas
+            </Button>
+          ) : (
+            <Button onClick={handleReset} variant="outline" className="w-full rounded-2xl">
+              Fechar
+            </Button>
           )}
         </div>
       </div>
